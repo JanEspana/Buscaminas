@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscaminas</title>
+</head>
+<body>
+    <h1>Buscaminas</h1>
+    <h4>Introduce los valores para generar un nuevo tablero:</h3>
+    <input type="text" id="filas" name="filas" placeholder="Nº filas"/>
+    <input type="text" id="columnas" name="columnas" placeholder="Nº columnas"/>
+    <input type="text" id="minas" name="minas" placeholder="Nº minas"/>
+    <button>Generar tablero</button>
+    <div id="juego">
+
+    </div>
+    <script>
+        let boton = document.querySelector('button');
+            boton.addEventListener('click', () =>
+            {
+                initJuego();
+            }
+            );
+        function initJuego()
+        {
+            
+            var tablero = new Tablero(parseInt(document.getElementById('filas').value), parseInt(document.getElementById('columnas').value), parseInt(document.getElementById('minas').value));
+            var jugador = new Jugador('Juan', 'Perez', 'juanpe', new Date('1990-01-01'), 'contraseña1234');
+            jugador.setEdad(jugador.fechaNacimiento);
+            console.log(jugador);
+            console.log(jugador.getEdad())
+            crearTablaDOM(tablero);
+            tablero.colocarBombas();
+            console.log(tablero);
+        }
+        function crearTablaDOM(tablero)
+            {
+
+
+                document.getElementById('juego').innerHTML = '';
+                for (var i = 0; i < tablero.filas; i++)
+                {
+                    let filaNueva = document.createElement('div');
+                    filaNueva.style.display = 'flex';
+                    for (var j = 0; j < tablero.columnas; j++)
+                    {
+                        let casilla = document.createElement('div');
+                        casilla.style.width = '50px';
+                        casilla.style.height = '50px';
+                        casilla.style.margin = '5px';
+                        casilla.style.backgroundColor = 'grey';
+                        filaNueva.appendChild(casilla);
+                    }
+                    document.getElementById('juego').appendChild(filaNueva);
+                }
+            }
+
+        class Jugador
+        {
+            #edad;
+            constructor(nombre, apellido, nick, fechaNacimiento, contraseña)
+            {
+                this.nombre = nombre;
+                this.apellido = apellido;
+                this.nick = nick;
+                this.fechaNacimiento = fechaNacimiento;
+                this.contraseña = contraseña;
+            }
+            getEdad()
+            {
+                return this.#edad;
+            }
+            setEdad(edad)
+            {
+                this.#edad = new Date().getFullYear() - this.fechaNacimiento.getFullYear();
+            }
+        }
+        class Tablero
+        {
+            matriz;
+            constructor(filas, columnas, minas)
+            {
+                this.filas = filas;
+                this.columnas = columnas;
+                this.minas = minas;
+                this.matriz = this.generarTablero();
+            }
+            generarTablero()
+            {
+                this.matrizTablero = [];   
+                for (var i = 0; i < this.filas; i++)
+                {
+                    this.matrizTablero[i] = [];
+                    for (var j = 0; j < this.columnas; j++)
+                    {
+                        this.matrizTablero[i][j] = new Casilla(i, j, 0, 0, false, false);
+                    }
+                }
+            }
+            colocarBombas()
+            {
+                for (var i = 0; i < this.minas; i++)
+                {
+                    var x = Math.floor(Math.random() * this.filas);
+                    var y = Math.floor(Math.random() * this.columnas);
+                    if (this.matrizTablero[x][y].mina == 0)
+                    {
+                        this.matrizTablero[x][y].mina = 1;
+                    }
+                    else
+                    {
+                        i--;
+                    }
+                }
+            }
+            calcularBombasAdyacentes()
+            {
+                for (var i = 0; i < this.filas; i++)
+                {
+                    for (var j = 0; j < this.columnas; j++)
+                    {
+                        
+                    }
+                }
+            }
+        }
+        class Casilla
+        {
+            constructor(x, y, mina, vecinos, visible, bandera)
+            {
+                this.x = x;
+                this.y = y;
+                this.mina = mina;
+                this.vecinos = vecinos;
+                this.visible = visible;
+                this.bandera = bandera;
+            }
+        }
+    </script>
+</body>
+</html>
