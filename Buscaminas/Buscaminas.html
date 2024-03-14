@@ -17,11 +17,11 @@
     </div>
     <script>
         let boton = document.querySelector('button');
-            boton.addEventListener('click', () =>
-            {
-                initJuego();
-            }
-            );
+        boton.addEventListener('click', () =>
+        {
+            initJuego();
+        }
+        );
         function initJuego()
         {
             
@@ -32,30 +32,42 @@
             console.log(jugador.getEdad())
             crearTablaDOM(tablero);
             tablero.colocarBombas();
+            tablero.calcularBombasAdyacentes();
             console.log(tablero);
         }
         function crearTablaDOM(tablero)
+        {
+            document.getElementById('juego').innerHTML = '';
+            for (var i = 0; i < tablero.filas; i++)
             {
-
-
-                document.getElementById('juego').innerHTML = '';
-                for (var i = 0; i < tablero.filas; i++)
+                let filaNueva = document.createElement('div');
+                filaNueva.style.display = 'flex';
+                for (var j = 0; j < tablero.columnas; j++)
                 {
-                    let filaNueva = document.createElement('div');
-                    filaNueva.style.display = 'flex';
-                    for (var j = 0; j < tablero.columnas; j++)
-                    {
-                        let casilla = document.createElement('div');
-                        casilla.style.width = '50px';
-                        casilla.style.height = '50px';
-                        casilla.style.margin = '5px';
-                        casilla.style.backgroundColor = 'grey';
-                        filaNueva.appendChild(casilla);
-                    }
-                    document.getElementById('juego').appendChild(filaNueva);
-                }
-            }
+                    let casilla = document.createElement('div');
+                    casilla.style.width = '50px';
+                    casilla.style.height = '50px';
+                    casilla.style.margin = '5px';
+                    casilla.style.backgroundColor = 'lightblue';
+                    casilla.style.border = '1px solid black';
+                    casilla.id = i + '-' + j;
+                    filaNueva.appendChild(casilla);
 
+                    casilla.addEventListener('click', () =>
+                    {
+                        if (tablero.matrizTablero[casilla.id[0]][casilla.id[2]].mina == 1)
+                        {
+                            casilla.style.backgroundColor = 'red';
+                        }
+                        else
+                        {
+                            casilla.style.backgroundColor = 'white';
+                        }
+                    });
+                }
+                document.getElementById('juego').appendChild(filaNueva);
+            }
+        }
         class Jugador
         {
             #edad;
@@ -120,11 +132,51 @@
                 {
                     for (var j = 0; j < this.columnas; j++)
                     {
-                        
+                        this.calcularVecinos(i, j);
+                    }
+                }
+            }
+            calcularVecinos(i, j)
+            {
+                if (this.matrizTablero[i][j].mina == 1)
+                {
+                    if(i > 0 && j > 0)
+                    {
+                        this.matrizTablero[i-1][j-1].vecinos++;
+                    }
+                    if(i > 0)
+                    {
+                        this.matrizTablero[i-1][j].vecinos++;
+                    }
+                    if(i > 0 && j < this.columnas - 1)
+                    {
+                        this.matrizTablero[i-1][j+1].vecinos++;
+                    }
+                    if(j > 0)
+                    {
+                        this.matrizTablero[i][j-1].vecinos++;
+                    }
+                    if(j < this.columnas - 1)
+                    {
+                        this.matrizTablero[i][j+1].vecinos++;
+                    }
+                    if(i < this.filas - 1 && j > 0)
+                    {
+                        this.matrizTablero[i+1][j-1].vecinos++;
+                    }
+                    if(i < this.filas - 1)
+                    {
+                        this.matrizTablero[i+1][j].vecinos++;
+                    }
+                    if(i < this.filas - 1 && j < this.columnas - 1)
+                    {
+                        this.matrizTablero[i+1][j+1].vecinos++;
                     }
                 }
             }
         }
+
+
         class Casilla
         {
             constructor(x, y, mina, vecinos, visible, bandera)
@@ -136,6 +188,7 @@
                 this.visible = visible;
                 this.bandera = bandera;
             }
+            
         }
     </script>
 </body>
