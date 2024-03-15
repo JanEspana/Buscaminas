@@ -4,18 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Buscaminas</title>
+    <style>
+        .casilla
+        {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
 </head>
-<body>
+<body onload="init()">
     <h1>Buscaminas</h1>
     <h4>Introduce los valores para generar un nuevo tablero:</h3>
     <input type="text" id="filas" name="filas" placeholder="Nº filas"/>
     <input type="text" id="columnas" name="columnas" placeholder="Nº columnas"/>
     <input type="text" id="minas" name="minas" placeholder="Nº minas"/>
     <button>Generar tablero</button>
+
     <div id="juego">
 
     </div>
     <script>
+        let numclicks = 0;
+        let casillasVisibles = 0;
         let boton = document.querySelector('button');
         boton.addEventListener('click', () =>
         {
@@ -24,20 +35,18 @@
         );
         function initJuego()
         {
-            
+            document.getElementById('juego').innerHTML = '';
             var tablero = new Tablero(parseInt(document.getElementById('filas').value), parseInt(document.getElementById('columnas').value), parseInt(document.getElementById('minas').value));
             var jugador = new Jugador('Juan', 'Perez', 'juanpe', new Date('1990-01-01'), 'contraseña1234');
             jugador.setEdad(jugador.fechaNacimiento);
             console.log(jugador);
             console.log(jugador.getEdad())
             crearTablaDOM(tablero);
-            tablero.colocarBombas();
-            tablero.calcularBombasAdyacentes();
             console.log(tablero);
         }
         function crearTablaDOM(tablero)
         {
-            document.getElementById('juego').innerHTML = '';
+            document.getElementById('juego').removeChild(document.getElementById('button'));
             for (var i = 0; i < tablero.filas; i++)
             {
                 let filaNueva = document.createElement('div');
@@ -45,29 +54,94 @@
                 for (var j = 0; j < tablero.columnas; j++)
                 {
                     let casilla = document.createElement('div');
-                    casilla.style.width = '50px';
-                    casilla.style.height = '50px';
+                    casilla.style.width = '30px';
+                    casilla.style.height = '30px';
                     casilla.style.margin = '5px';
-                    casilla.style.backgroundColor = 'lightblue';
+                    casilla.style.backgroundColor = 'lightgrey';
                     casilla.style.border = '1px solid black';
                     casilla.id = i + '-' + j;
+                    casilla.className = 'casilla';
                     filaNueva.appendChild(casilla);
 
                     casilla.addEventListener('click', () =>
                     {
-                        if (tablero.matrizTablero[casilla.id[0]][casilla.id[2]].mina == 1)
+                        let x = parseInt(casilla.id.split('-')[0]);
+                        let y = parseInt(casilla.id.split('-')[1]);
+                        if (numclicks == 0)
                         {
-                            casilla.style.backgroundColor = 'red';
+                            tablero.colocarBombas(x, y);
+                            tablero.calcularBombasAdyacentes();
                         }
-                        else
+                        if (!tablero.matrizTablero[x][y].visible && !tablero.matrizTablero[x][y].bandera)
                         {
-                            casilla.style.backgroundColor = 'white';
+                            tablero.destaparCasilla(x, y);
+                            actualizaTablero(tablero, x, y, casilla);
                         }
+                        numclicks++;
+                        console.log(numclicks);
+                        if (casillasVisibles == tablero.filas * tablero.columnas - tablero.minas)
+                        {
+                            console.log(casillasVisibles);
+                            alert('Has ganado');
+                        }
+                    });
+                    
+                    casilla.addEventListener('contextmenu', () =>
+                    {
+                        let x = parseInt(casilla.id.split('-')[0]);
+                        let y = parseInt(casilla.id.split('-')[1]);
+                        if (!tablero.matrizTablero[x][y].visible)
+                        {
+                            tablero.matrizTablero[x][y].bandera = !tablero.matrizTablero[x][y].bandera;
+                            marcarBandera(tablero, x, y, casilla);
+                        }
+                        event.preventDefault();
                     });
                 }
                 document.getElementById('juego').appendChild(filaNueva);
             }
         }
+        function actualizaTablero(tablero, x, y, casilla)
+        {
+            for (let i = 0; i < tablero.filas; i++)
+            {
+                for (let j = 0; j < tablero.columnas; j++)
+                {
+                    if (tablero.matrizTablero[i][j].visible && !tablero.matrizTablero[i][j].bandera && tablero.matrizTablero[i][j].mina == 0)
+                    {
+                        if (tablero.matrizTablero[i][j].vecinos > 0)
+                        {
+                            document.getElementById(i + '-' + j).style.backgroundColor = 'lightgreen';
+                            document.getElementById(i + '-' + j).innerHTML = tablero.matrizTablero[i][j].vecinos;
+                        }
+                        if (tablero.matrizTablero[i][j].vecinos == 0)
+                        {
+                            document.getElementById(i + '-' + j).style.backgroundColor = 'lightblue';
+                        }
+                    }
+                    else if (tablero.matrizTablero[i][j].mina == 1 && tablero.matrizTablero[i][j].visible)
+                    {
+                        document.getElementById(i + '-' + j).style.backgroundColor = 'red';
+                        document.getElementById(i + '-' + j).innerHTML = 'X';
+                    }
+                }
+            }
+        }
+        
+        function marcarBandera(tablero, x, y, casilla)
+        {
+            if (tablero.matrizTablero[x][y].bandera)
+            {
+                casilla.innerHTML = 'B';
+                document.getElementById(x + '-' + y).style.backgroundColor = 'yellow';
+            }
+            else
+            {
+                casilla.innerHTML = '';
+                document.getElementById(x + '-' + y).style.backgroundColor = 'lightgrey';
+            }
+        }
+
         class Jugador
         {
             #edad;
@@ -110,15 +184,15 @@
                     }
                 }
             }
-            colocarBombas()
+            colocarBombas(x, y)
             {
                 for (var i = 0; i < this.minas; i++)
                 {
-                    var x = Math.floor(Math.random() * this.filas);
-                    var y = Math.floor(Math.random() * this.columnas);
-                    if (this.matrizTablero[x][y].mina == 0)
+                    var xRand = Math.floor(Math.random() * this.filas);
+                    var yRand = Math.floor(Math.random() * this.columnas);
+                    if (this.matrizTablero[xRand][yRand].mina == 0 && xRand != x && yRand != y)
                     {
-                        this.matrizTablero[x][y].mina = 1;
+                        this.matrizTablero[xRand][yRand].mina = 1;
                     }
                     else
                     {
@@ -174,6 +248,60 @@
                     }
                 }
             }
+            destaparCasilla(i, j)
+            {
+                if (this.matrizTablero[i][j].mina == 1)
+                {
+                    for (var i = 0; i < this.filas; i++)
+                    {
+                        for (var j = 0; j < this.columnas; j++)
+                        {
+                            this.matrizTablero[i][j].revelar();
+                        }
+                    }
+                    alert('Has perdido');
+                }
+                else if (this.matrizTablero[i][j].vecinos == 0)
+                {
+                    this.matrizTablero[i][j].revelar();
+                    if(i > 0 && j > 0 && !this.matrizTablero[i-1][j-1].visible)
+                    {
+                        this.destaparCasilla(i-1, j-1);
+                    }
+                    if(i > 0 && !this.matrizTablero[i-1][j].visible)
+                    {
+                        this.destaparCasilla(i-1, j);
+                    }
+                    if(i > 0 && j < this.columnas - 1 && !this.matrizTablero[i-1][j+1].visible)
+                    {
+                        this.destaparCasilla(i-1, j+1);
+                    }
+                    if(j > 0 && !this.matrizTablero[i][j-1].visible)
+                    {
+                        this.destaparCasilla(i, j-1);
+                    }
+                    if(j < this.columnas - 1 && !this.matrizTablero[i][j+1].visible)
+                    {
+                        this.destaparCasilla(i, j+1);
+                    }
+                    if(i < this.filas - 1 && j > 0 && !this.matrizTablero[i+1][j-1].visible)
+                    {
+                        this.destaparCasilla(i+1, j-1);
+                    }
+                    if(i < this.filas - 1   && !this.matrizTablero[i+1][j].visible)
+                    {
+                        this.destaparCasilla(i+1, j);
+                    }
+                    if(i < this.filas - 1 && j < this.columnas - 1 && !this.matrizTablero[i+1][j+1].visible)
+                    {
+                        this.destaparCasilla(i+1, j+1);
+                    }
+                }
+                else if (this.matrizTablero[i][j].vecinos > 0)
+                {
+                    this.matrizTablero[i][j].revelar();
+                }
+            }
         }
 
 
@@ -188,7 +316,15 @@
                 this.visible = visible;
                 this.bandera = bandera;
             }
-            
+            revelar()
+            {
+                this.visible = true;
+                casillasVisibles++;
+            }
+            marcar()
+            {
+                this.bandera = true;
+            }
         }
     </script>
 </body>

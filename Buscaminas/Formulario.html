@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario</title>
+</head>
+<body>
+    <form>
+        <p>
+            <label for="Name">Nombre: </label>
+            <input type="text" id="Name" name="Name" required>
+        </p>
+        <p>
+            <label for="Surname">Apellidos: </label>
+            <input type="text" id="Surname" name="Surname" required>
+        </p>
+        <p>
+            <label for="Nick">Apodo: </label>
+            <input type="text" id="Nick" name="Nick" required>
+        </p>
+        <p>
+            <label for="Birthday">Cumpleaños: </label>
+            <input type="date" id="Birthday" name="Birthday" required>
+        </p>
+        <p>
+            <label for="Password">Contraseña: </label>
+            <input type="password" id="Password" name="Password" required>
+        </p>
+        <button type="submit">Enviar</button>
+    </form>
+
+    <script>
+        var form = document.querySelector('form');
+        form.addEventListener('submit', () =>
+        {
+            var name = document.getElementById('Name').value;
+            var surname = document.getElementById('Surname').value;
+            var nick = document.getElementById('Nick').value;
+            var birthday = document.getElementById('Birthday').value;
+            var password = document.getElementById('Password').value;
+            var age = new Date().getFullYear() - new Date(birthday).getFullYear();
+            
+            
+        });
+    </script>
+</body>
+</html>
