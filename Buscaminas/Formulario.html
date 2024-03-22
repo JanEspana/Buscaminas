@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="Formulario.js"></script>
+    <link rel="stylesheet" href="style.css">
     <title>Formulario</title>
 </head>
-<body>
-    <form>
+<body onload="init()">
+    <form id="Formulario">
         <p>
             <label for="Name">Nombre: </label>
             <input type="text" id="Name" name="Name" required>
@@ -20,29 +22,26 @@
             <input type="text" id="Nick" name="Nick" required>
         </p>
         <p>
-            <label for="Birthday">Cumpleaños: </label>
-            <input type="date" id="Birthday" name="Birthday" required>
+            <label for="BirthDate">Fecha de nacimiento: </label>
+            <input type="date" id="BirthDate" name="BirthDate" required>
         </p>
         <p>
-            <label for="Password">Contraseña: </label>
-            <input type="password" id="Password" name="Password" required>
+            <label for="Email">Correo electrónico: </label>
+            <input type="email" id="Email" name="Email" required> 
+        </p>
+        <p>
+            <label for="Filas">Número de filas: </label>
+            <input type="number" id="Filas" name="Filas" required>
+        </p>
+        <p>
+            <label for="Columnas">Número de columnas: </label>
+            <input type="number" id="Columnas" name="Columnas" required>
+        </p>
+        <p>
+            <label for="Minas">Número de minas: </label>
+            <input type="number" id="Minas" name="Minas" required>
         </p>
         <button type="submit">Enviar</button>
     </form>
-
-    <script>
-        var form = document.querySelector('form');
-        form.addEventListener('submit', () =>
-        {
-            var name = document.getElementById('Name').value;
-            var surname = document.getElementById('Surname').value;
-            var nick = document.getElementById('Nick').value;
-            var birthday = document.getElementById('Birthday').value;
-            var password = document.getElementById('Password').value;
-            var age = new Date().getFullYear() - new Date(birthday).getFullYear();
-            
-            
-        });
-    </script>
 </body>
 </html>
